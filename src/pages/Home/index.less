@@ -1,0 +1,142 @@
+:global(.ant-pro-page-container-children-content) {
+  padding-block: 0 !important;
+  padding-inline: 0 !important;
+}
+
+:global(.ant-radio-button-wrapper-checked) {
+  border-color: rgb(228, 238, 253) !important;
+  color:rgb(69, 153, 247) !important;
+  font-weight: 600;
+}
+
+:global(.ant-radio-button-checked) {
+  background-color: rgb(228, 238, 253);
+  
+}
+
+:global(.ant-radio-button) {
+  color:#333
+}
+
+:global(.ant-radio-button-wrapper) {
+  background-color:rgb(234, 234, 234) !important;
+}
+
+.container {
+  min-width: 999px;
+}
+
+.headerBgView {
+  background-image: url(../../assets/headbg.png);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 82px;
+
+  .headerView {
+    width: 64%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    .logoImg {
+      width: 200px;
+    }
+
+    .headerTitle {
+      color: white;
+      margin-left: 60px;
+      font-size: 22px;
+      vertical-align: middle
+    }
+
+    .headerNameLogo {
+      width: 30px;
+      vertical-align: middle
+    }
+
+    .headerName {
+      margin-left: 5px;
+      color: white;
+      vertical-align: middle;
+      font-size: 16px;
+
+    }
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .introductionView {
+    width: 64%;
+    margin-top: 60px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .introductionLeftView {
+      // width: 58%;
+      // width: 480px;
+      padding-right: 10px;
+
+      .rowText1 {
+        font-size: 21px;
+        color: #000;
+        margin-bottom: 10px;
+        font-weight: 400;
+      }
+
+      .rowText2 {
+        font-size: 18px;
+        color: #333;
+      }
+    }
+
+    .introductionRightView {
+      :global(.ant-radio-button-wrapper) {
+        width: 50%;
+        justify-content: center;
+        align-items: center;
+        padding: auto;
+        text-align: center;
+        border-radius: 0px;
+      }
+
+
+      .videoView {
+        width: 400px;
+      }
+    }
+  }
+
+  .infoView{
+    width: 64%;
+    display: flex;
+    flex-direction: row;
+    margin-top: 10px;
+    // background-color: red;
+  }
+  .bottomView{
+    width: 100%;
+    padding-left: 18%;
+    padding-right: 18%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 300px;
+    height: 100px;
+    background-color: #404040;
+    .infoLabel{
+      color:white;
+      font-size: 16px; 
+      vertical-align: middle;
+    }
+  }
+}
