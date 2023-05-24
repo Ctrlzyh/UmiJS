@@ -8,7 +8,6 @@ export async function getInitialState(): Promise<{ name: string }> {
 
 export const layout = () => {
   return {
-    // logo: require('./assets/login_top_logo.png'),
     title: '',
     menu: {
       locale: true,

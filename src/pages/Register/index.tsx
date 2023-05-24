@@ -1,12 +1,12 @@
 import { PageContainer } from '@ant-design/pro-components';
 import { Access, useAccess } from '@umijs/max';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { LeftOutlined } from '@ant-design/icons';
 import styles from './index.less';
 import { useEffect, useState } from 'react';
-import { history } from 'umi';
+import { history,useNavigate } from 'umi';
 import type { CascaderProps } from 'antd';
 import {
-  AutoComplete,
+  message,
   Button,
   Cascader,
   Checkbox,
@@ -17,6 +17,8 @@ import {
   Row,
   Select,
 } from 'antd';
+import request from '@/utils/request';
+
 
 const { Option } = Select;
 
@@ -30,45 +32,43 @@ interface DataNodeType {
 const ReigsterPage: React.FC = () => {
 
   const [windowSize, setWindowSize] = useState(getWindowSize());
-  const [userName, setUserName] = useState<String>("");
-  const [password, setPassword] = useState<String>("");
+  const [departmentList, setDepartmentList] = useState<Array<any>>([]);
+
+  const [messageApi, ContextHolder] = message.useMessage();
+
+  console.log('---location->',history.location)
+  
+  if (history.location?.state?.type === 'change') {
+    document.title = "编辑信息"
+  }
+
+  const success = (msg:string) => {
+    messageApi.open({
+      type: 'success',
+      content: msg,
+    });
+  };
+
+  const error = (msg:string) => {
+    messageApi.open({
+      type: 'error',
+      content: msg,
+    });
+  };
 
 
-
-  const residences: CascaderProps<DataNodeType>['options'] = [
-    {
-      value: 'zhejiang',
-      label: 'Zhejiang',
-      children: [
-        {
-          value: 'hangzhou',
-          label: 'Hangzhou',
-          children: [
-            {
-              value: 'xihu',
-              label: 'West Lake',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      value: 'jiangsu',
-      label: 'Jiangsu',
-      children: [
-        {
-          value: 'nanjing',
-          label: 'Nanjing',
-          children: [
-            {
-              value: 'zhonghuamen',
-              label: 'Zhong Hua Men',
-            },
-          ],
-        },
-      ],
-    },
-  ];
+  useEffect(() => {
+    const params =  { "baseCode": "department", "itemKey": "", "parentItemKey": "" }
+    let res = request('/baseData/searchByCode',params,'post');
+    res.then(response => {
+      if (response.code == 200) {
+        setDepartmentList(response.data)
+      } else {
+        setDepartmentList([])
+        error(response.msg)
+      }
+   })
+   }, []);
 
   const formItemLayout = {
     labelCol: {
@@ -95,10 +95,50 @@ const ReigsterPage: React.FC = () => {
   };
 
   const [form] = Form.useForm();
-
+  const toBack = ()=>{
+    // console.log('---history-->',history)
+    history.back()
+    // useNavigate.
+    
+  }
   const onFinish = (values: any) => {
     console.log('Received values of form: ', values);
-    history.push({ pathname: '/login' })
+    // 
+    // history.push({ pathname: '/login' })
+    const { studentUuid, studentName, gender, password, phoneNumber, email,department,specialities,className } = values
+    const params = {
+      "studentUuid": studentUuid,
+      "studentName": studentName,
+      "gender": gender,
+      "password": password,
+      "phoneNumber": phoneNumber,
+      "email": email,
+      "department": department,
+      "specialities": specialities,
+      "className": className
+    }
+
+    // /user/update
+    if (history.location?.state?.type === 'change') {
+      let res = request('/user/update',{'params':params},'post');
+     res.then(response => {
+      if(response.code == 200) {
+        success(response.msg)
+        
+      } else {
+        error(response.msg)
+      }
+    })
+    } else {
+      let res = request('/user/register',{'params':params},'post');
+      res.then(response => {
+       if(response.code == 200) {
+         success(response.msg)
+       } else {
+         error(response.msg)
+       }
+     })
+    }
   };
 
   const prefixSelector = (
@@ -140,23 +180,25 @@ const ReigsterPage: React.FC = () => {
       }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
-        <div style={{ width: "64%", backgroundColor: 'white', borderRadius: 4, overflow: 'hidden',width: 850 }}>
-          <div style={{ width: "100%", height: 50, textAlign: 'center', backgroundColor: 'rgb(220,220,220)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div style={{ fontSize: 28, color: 'white' }}>注 册</div>
+        <div style={{ width: "64%", backgroundColor: 'white', borderRadius: 4, overflow: 'hidden', width: 850 }}>
+          <div style={{ width: "100%", height: 50, textAlign: 'center', backgroundColor: 'rgb(220,220,220)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Button style={{ color: "#000" }} type='text' size="large" icon={<LeftOutlined />} onClick={toBack}>返回</Button>
+            <div style={{ fontSize: 28, color: 'white' }}>{ history.location?.state?.type === 'change'? "编辑信息" : "注册"}</div>
+            <div style={{width: 100, height: 2}}> </div>
           </div>
-          <div style={{ paddingTop: 20}}>
+          <div style={{ paddingTop: 20 }}>
             <Form
               {...formItemLayout}
               form={form}
               name="register"
               onFinish={onFinish}
-              initialValues={{ residence: ['zhejiang', 'hangzhou', 'xihu'], prefix: '86' }}
-              style={{ width: 600, marginLeft: 40}}
+              initialValues={ history.location?.state?.info || null}
+              style={{ width: 600, marginLeft: 40 }}
               scrollToFirstError
             >
 
               <Form.Item
-                name="number"
+                name="studentUuid"
                 label="学号"
                 rules={[
                   {
@@ -169,7 +211,7 @@ const ReigsterPage: React.FC = () => {
               </Form.Item>
 
               <Form.Item
-                name="name"
+                name="studentName"
                 label="姓名"
                 // tooltip="What do you want others to call you?"
                 rules={[{ required: true, message: '请输入你的姓名!', whitespace: true }]}
@@ -183,11 +225,11 @@ const ReigsterPage: React.FC = () => {
                 rules={[{ required: true, message: '请选择你的性别!' }]}
               >
                 <Select placeholder="请选择性别">
-                  <Option value="male">男</Option>
-                  <Option value="female">女</Option>
+                  <Option value="0">男</Option>
+                  <Option value="1">女</Option>
                 </Select>
               </Form.Item>
-
+              
               <Form.Item
                 name="password"
                 label="密码"
@@ -196,13 +238,20 @@ const ReigsterPage: React.FC = () => {
                     required: true,
                     message: '请输入你的密码!',
                   },
+                  {
+                    min: 4,
+                    message: '最少4个字符',
+                  },
+                  {
+                    max: 16,
+                    message: '最多16个字符',
+                  }
                 ]}
                 hasFeedback
               >
                 <Input.Password placeholder="请输入密码" />
               </Form.Item>
-
-              <Form.Item
+              {history.location?.state?.type !== 'change' &&  <Form.Item
                 name="confirm"
                 label="确认密码"
                 dependencies={['password']}
@@ -223,14 +272,16 @@ const ReigsterPage: React.FC = () => {
                 ]}
               >
                 <Input.Password placeholder="请再次输入密码" />
-              </Form.Item>
+              </Form.Item>}
+             
 
               <Form.Item
-                name="phone"
+                name="phoneNumber"
                 label="电话"
-                rules={[{ required: false, message: '请输入你的电话!' }]}
+                rules={[{ required: false, message: '请输入你的电话!' },
+                { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号码格式！' },]}
               >
-                <Input addonBefore={prefixSelector} style={{ width: '100%' }} placeholder="请输入电话号码"/>
+                <Input style={{ width: '100%' }} placeholder="请输入电话号码" />
               </Form.Item>
 
               <Form.Item
@@ -247,31 +298,48 @@ const ReigsterPage: React.FC = () => {
                   },
                 ]}
               >
-                <Input placeholder="请输入邮箱地址"/>
+                <Input placeholder="请输入邮箱地址" />
+              </Form.Item>
+              <Form.Item
+                name="department"
+                label="院系"
+                rules={[{ required: true, message: '请选择你的学院!' }]}
+              >
+                <Select placeholder="请选择学院">
+                  {departmentList.map((item:any)=>(
+                    <Option key={item.itemKey} value={item.itemKey}>{item.itemValue}</Option>
+                  ))}
+                </Select>
               </Form.Item>
 
-              {/* <Form.Item
-                name="residence"
-                label="Habitual Residence"
-                rules={[
-                  { type: 'array', required: true, message: 'Please select your habitual residence!' },
-                ]}
+              <Form.Item
+                name="specialities"
+                label="专业"
+                // tooltip="What do you want others to call you?"
+                rules={[{ required: true, message: '请输入你的专业!', whitespace: true }]}
               >
-                <Cascader options={residences} />
-              </Form.Item> */}
+                <Input placeholder="请输入专业" />
+              </Form.Item>
+
+              <Form.Item
+                name="className"
+                label="班级"
+                // tooltip="What do you want others to call you?"
+                // rules={[{ required: false, message: '请输入你的姓名!', whitespace: true }]}
+              >
+                <Input placeholder="请输入班级" />
+              </Form.Item>
 
               <Form.Item {...tailFormItemLayout}>
-                <Button style={{width: 300, height: 40}} type="primary" htmlType="submit">
+                <Button style={{ width: 300, height: 40 }} type="primary" htmlType="submit">
                   提交
                 </Button>
               </Form.Item>
             </Form>
           </div>
         </div>
-
       </div>
-
-
+      {ContextHolder}
     </PageContainer>
   );
 };

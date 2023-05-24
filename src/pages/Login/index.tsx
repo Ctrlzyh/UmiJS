@@ -1,10 +1,11 @@
 import { PageContainer } from '@ant-design/pro-components';
-import { Access, useAccess } from '@umijs/max';
-import { Input, Button } from 'antd';
+import { Input, Button,message} from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import styles from './index.less';
 import { useEffect, useState } from 'react';
 import { history } from 'umi';
+import request from '@/utils/request';
+import userInfo from  '@/utils/userUtils';
 
 
 
@@ -13,6 +14,21 @@ const AccessPage: React.FC = () => {
   const [windowSize, setWindowSize] = useState(getWindowSize());
   const [userName, setUserName] = useState<String>("");
   const [password, setPassword] = useState<String>("");
+  const [messageApi, ContextHolder] = message.useMessage();
+
+  const success = (msg:string) => {
+    messageApi.open({
+      type: 'success',
+      content: msg,
+    });
+  };
+
+  const error = (msg:string) => {
+    messageApi.open({
+      type: 'error',
+      content: msg,
+    });
+  };
 
   useEffect(() => {
     function handleWindowResize() {
@@ -38,7 +54,26 @@ const AccessPage: React.FC = () => {
   };
 
   const onClickLogin = () => {
-    history.push({ pathname: '/home' })
+    // history.push({ pathname: '/home' })
+    const params = {
+      "studentUuid": userName,
+       "password": password
+    }
+    let res = request('/user/login',{'params':params},'post');
+     res.then(response => {
+      if(response.code == 200) {
+        success(response.msg)
+        userInfo.setUserInfo(response.data)
+        console.log('user--->', userInfo.getUserInfo())
+        if (userInfo.getUserInfo().studentUuid === 'admin') {
+          history.push({ pathname: '/table' })
+        } else {
+          history.push({ pathname: '/home' })
+        }
+      } else {
+        error(response.msg)
+      }
+    })
   }
 
   const onClickRegister = () => {
@@ -76,8 +111,7 @@ const AccessPage: React.FC = () => {
           </div>
         </div>
       </div>
-
-
+      {ContextHolder}
     </PageContainer>
   );
 };

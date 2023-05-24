@@ -4,21 +4,40 @@ import { trim } from '@/utils/format';
 import { PageContainer } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
 import styles from './index.less';
-import { Radio, Tabs, } from 'antd';
-import type { SelectProps, RadioChangeEvent, TabsProps } from 'antd';
+import { Radio, Tabs, Modal} from 'antd';
+import type { SelectProps, RadioChangeEvent, TabsProps, } from 'antd';
 import request from '@/utils/request';
+import userInfo from  '@/utils/userUtils';
+import {  ExclamationCircleOutlined } from '@ant-design/icons';
+import { history } from 'umi';
+
 
 
 const HomePage: React.FC = () => {
   const { name } = useModel('global');
   const [videoNumber, setVideoNumber] = useState<String>("1");
+  const [modal, ContextHolder] = Modal.useModal();
 
-  useEffect(() => {
-   let res = request('/user/info',null,'post');
-   res.then(response => {
-    // console.log('111111111网络请求成功：', response);
-  })
-  }, []);
+  // useEffect(() => {
+  //  let res = request('/user/info',null,'post');
+  //  res.then(response => {
+  //   // console.log('111111111网络请求成功：', response);
+  // })
+  // }, []);
+
+  const onLogout = () => {
+    modal.confirm({
+      title: '提示',
+      icon: <ExclamationCircleOutlined />,
+      content: '退出登录',
+      okText: '确认',
+      cancelText: '取消',
+      onOk() {
+        userInfo.setUserInfo(null)
+        history.replace('/login');
+      }
+    });
+  }
 
   const handleSizeChange = (e: RadioChangeEvent) => {
     setVideoNumber(e.target.value)
@@ -30,7 +49,9 @@ const HomePage: React.FC = () => {
 
   const toOther = () =>{
       console.log('11111')
-      window.open(`http://moni3.haimijiaoyu.com?id=${name}`)
+      // studentUuid
+      // userInfo.getUserInfo()?.studentName
+      window.open(`http://moni3.haimijiaoyu.com?id=${userInfo.getUserInfo()?.studentUuid}`)
   }
 
   const items: TabsProps['items'] = [
@@ -106,9 +127,9 @@ const HomePage: React.FC = () => {
               <img src={require('../../assets/logo1.png')} className={styles.logoImg} />
               <span className={styles.headerTitle}>虛拟仿真实验教学申报项目</span>
             </div>
-            <div>
+            <div style={{cursor: 'pointer'}} onClick={onLogout}>
               <img className={styles.headerNameLogo} src={require('../../assets/user.png')} />
-              <span className={styles.headerName}>用户昵称</span>
+              <span className={styles.headerName}>{ userInfo.getUserInfo()?.studentName || '用户昵称'}</span>
             </div>
           </div>
         </div>
@@ -155,6 +176,7 @@ const HomePage: React.FC = () => {
         </div>
         </div>
       </div>
+      {ContextHolder}
     </PageContainer>
   );
 };

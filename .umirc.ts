@@ -12,7 +12,8 @@ export default defineConfig({
   title:'loading...',
   links: [
     // href的图片你可以放在public里面，直接./图片名.png 就可以了，也可以是cdn链接
-    { rel: 'icon', href: './assets/login_top_logo.ico' },
+    { rel: 'icon', href: '/favicon.ico' },
+
   ],
   routes: [
     {
@@ -45,7 +46,7 @@ export default defineConfig({
       history: 'hash',
     },
     {
-      name: ' CRUD 示例',
+      name: '用户管理中心',
       path: '/table',
       component: './Table',
       menuRender: false,
@@ -59,9 +60,9 @@ export default defineConfig({
 
   proxy: {
     '/api': {
-      'target': 'http://heymock.uneedcode.com/',
+      'target': 'http://fangzhen.haimijiaoyu.com/',
       'changeOrigin': true,
-      'pathRewrite': { '^/api' : 'mock/5fcb3bdb1f1f08da' },
+      'pathRewrite': { '^/api' : 'pam-api' },
     },
   },
 });
