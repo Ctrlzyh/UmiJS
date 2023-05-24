@@ -349,13 +349,13 @@ const TableList: React.FC<unknown> = () => {
     },
     {
       title: '审核',
-      dataIndex: 'option',
+      dataIndex: 'status',
       valueType: 'option',
       render: (_, record: any) => (
         <>
           <Button type="primary" size="small" onClick={() => onExamine(record.studentUuid, 'pass')}>通过</Button>
           <Divider type="vertical" />
-          <Button type="primary" danger size="small" onClick={() => onExamine(record.studentUuid, 'failed')}>拒绝</Button>
+          <Button disabled={record.status==="failed"} type="primary" danger size="small" onClick={() => onExamine(record.studentUuid, 'failed')}>拒绝</Button>
         </>
       ),
     },

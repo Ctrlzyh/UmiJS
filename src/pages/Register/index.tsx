@@ -86,7 +86,6 @@ const ReigsterPage: React.FC = () => {
     
   }
   const onFinish = (values: any) => {
-    console.log('Received values of form: ', values);
     setLoading(true)
     // 
     // history.push({ pathname: '/login' })
