@@ -17,15 +17,11 @@ let userInfo = {
 }
 
 const setUserInfo = (info: any)=>{
-    console.log('---123--->',JSON.stringify(info))
-    // userInfo = info
     localStorage.setItem("userInfo", JSON.stringify(info))
 }
 
 const getUserInfo = () =>{
-    // console.log('---userInfo->',userInfo)
     const info = localStorage.getItem("userInfo")
-    //  console.log('---info->',JSON.parse(info))
     return  JSON.parse(info || "")
 }
 

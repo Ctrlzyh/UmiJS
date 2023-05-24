@@ -39,8 +39,7 @@ const umi_request = (url: string, data: any, method = 'post') => {
                 message: '提示',
             });
             console.log(url, '网络请求异常：', error);
-            console.log(url, '网络请求异常code：', error.response.status);
-            if (error.response.status == 401) {
+            if (error.response?.status == 401) {
                 history.replace('/login');
             }
         });

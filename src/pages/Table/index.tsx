@@ -1,114 +1,59 @@
 import services from '@/services/demo';
 import {
   ActionType,
-  FooterToolbar,
   PageContainer,
-  ProDescriptions,
   ProDescriptionsItemProps,
   ProTable,
 } from '@ant-design/pro-components';
-import { Button, Divider, Drawer, message, Tooltip, Modal, notification } from 'antd';
+import { Button, Divider, Drawer, message, Tooltip, Modal, notification, Table } from 'antd';
 import React, { useRef, useState, useEffect } from 'react';
-import CreateForm from './components/CreateForm';
-import UpdateForm, { FormValueType } from './components/UpdateForm';
 import { DeleteOutlined, FormOutlined, DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import styles from './index.less';
-import { history , useNavigate} from 'umi';
+import { history, useNavigate } from 'umi';
 import request from '@/utils/request';
-import userInfo from  '@/utils/userUtils';
+import userInfo from '@/utils/userUtils';
 
-
-const { addUser, queryUserList, deleteUser, modifyUser } =
-  services.UserController;
-
-/**
- * 添加节点
- * @param fields
- */
-const handleAdd = async (fields: API.UserInfo) => {
-  const hide = message.loading('正在添加');
-  try {
-    await addUser({ ...fields });
-    hide();
-    message.success('添加成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('添加失败请重试！');
-    return false;
-  }
-};
-
-/**
- * 更新节点
- * @param fields
- */
-const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('正在配置');
-  try {
-    await modifyUser(
-      {
-        userId: fields.id || '',
-      },
-      {
-        name: fields.name || '',
-        nickName: fields.nickName || '',
-        email: fields.email || '',
-      },
-    );
-    hide();
-
-    message.success('配置成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('配置失败请重试！');
-    return false;
-  }
-};
-
-/**
- *  删除节点
- * @param selectedRows
- */
-const handleRemove = async (selectedRows: API.UserInfo[]) => {
-  const hide = message.loading('正在删除');
-  if (!selectedRows) return true;
-  try {
-    await deleteUser({
-      userId: selectedRows.find((row) => row.id)?.id || '',
-    });
-    hide();
-    message.success('删除成功，即将刷新');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('删除失败，请重试');
-    return false;
-  }
-};
 
 const TableList: React.FC<unknown> = () => {
-  const [createModalVisible, handleModalVisible] = useState<boolean>(false);
-  const [updateModalVisible, handleUpdateModalVisible] =
     useState<boolean>(false);
-  const [stepFormValues, setStepFormValues] = useState({});
   const actionRef = useRef<ActionType>();
-  const [row, setRow] = useState<API.UserInfo>();
-  const [selectedRowsState, setSelectedRows] = useState<API.UserInfo[]>([]);
   const [windowSize, setWindowSize] = useState(getWindowSize());
   const [modal, ContextHolder] = Modal.useModal();
   const [selectItem, setSelectItem] = useState<String>("1");
   const [departmentList, setDepartmentList] = useState<Array<any>>([]);
+  const [open, setOpen] = useState(false);
+  const [drawerTitle, setDrawerTitle] = useState<String>("");
+  const [data, setData] = useState<any[]>();
+  const [loading, setLoading] = useState(false);
+  const [studentUuid, setStudentUuid] = useState('');
 
-  const navigate = useNavigate();
+  const [tableParams, setTableParams] = useState<any>({
+    pagination: {
+      current: 1,
+      pageSize: 10,
+    },
+  });
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+    setTableParams({
+      pagination: {
+        current: 1,
+        pageSize: 10,
+      },
+    })
+  };
 
   useEffect(() => {
     const params = { "baseCode": "department", "itemKey": "", "parentItemKey": "" }
     let res = request('/baseData/searchByCode', params, 'post');
     res.then(response => {
-      if (response.code == 200) {
-        setDepartmentList(response.data)
+      if (response?.code == 200) {
+        setDepartmentList(response?.data)
       } else {
         setDepartmentList([])
       }
@@ -147,42 +92,73 @@ const TableList: React.FC<unknown> = () => {
     const params = { "params": { "studentUuid": studentUuid, "status": status } }
     let res = request('/user/examine', params, 'post');
     res.then(response => {
-      console.log('--response--->',response)
-      notification.error({
-        description: response?.msg || "网络发生异常，无法连接服务器",
-        message: '提示',
-      });
       if (response?.code == 200) {
+        notification.success({
+          description: response?.msg || "网络发生异常，无法连接服务器",
+          message: '提示',
+        })
         actionRef.current?.reload()
       } else {
+        notification.error({
+          description: response?.msg || "网络发生异常，无法连接服务器",
+          message: '提示',
+        });
         // history.push('/register');
       }
     })
   }
 
-  const onCheckScore = (studentUuid: string,) => {
-    const params = {"page": { "pageNum": 1, "pageSize": 10, }, "params": { "studentUuid": studentUuid, "scoreType": "test" } }
+  const onCheckScore = (studentUuid: string, scoreType: string) => {
+    setStudentUuid(studentUuid)
+    setDrawerTitle('test')
+    // drawerTitle
+    setLoading(true)
+    const params = { "page": { "pageNum": tableParams.pagination.current, "pageSize": tableParams.pagination.pageSize, }, "params": { "studentUuid": studentUuid, "scoreType": scoreType } }
     let res = request('/userScore/search', params, 'post');
     res.then(response => {
-      console.log('--response--->',response)
-      // if (response?.code == 200) {
-      //   actionRef.current?.reload()
-      // } else {
+      showDrawer()
+      setData(response?.data?.list || [])
+      let pagination = {
+        total: response?.data?.total,
+        current: tableParams.pagination.current,
+        pageSize: tableParams.pagination.pageSize,
+      }
 
-      // }
+      setTableParams({
+        pagination,
+      })
+      setLoading(false)
     })
   }
 
-  const onChangeInfo = (info: any) =>{
+  const handleTableChange = (
+    pagination: any,
+    filters: any,
+    sorter: any,
+  ) => {
+    const { current, pageSize } = pagination
+    setLoading(true)
+    const params = { "page": { "pageNum": current, "pageSize": pageSize, }, "params": { "studentUuid": studentUuid, "scoreType": drawerTitle } }
+    let res = request('/userScore/search', params, 'post');
+    res.then(response => {
+      showDrawer()
+      setData(response?.data?.list || [])
+      let pagination = {
+        total: response?.data?.total,
+        current,
+        pageSize,
+      }
+      setTableParams({
+        pagination,
+      })
+      setLoading(false)
+    })
+  };
+
+  const onChangeInfo = (info: any) => {
     let data = info
     data.gender = info.gender ? '1' : '0'
-    history.push('/register', { info: data, type: 'change'})
-  //   navigate('/register', {
-  //     state: {
-  //       info: data,
-  //       type: 'change'
-  //     }
-  // })
+    history.push('/register', { info: data, type: 'change' })
   }
 
   const columns: ProDescriptionsItemProps<API.UserInfo>[] = [
@@ -193,7 +169,7 @@ const TableList: React.FC<unknown> = () => {
       render: (_, record) => (
         <>
           <Tooltip title="修改">
-            <Button style={{ borderWidth: 0, backgroundColor: 'rgba(0,0,0,0)', boxShadow: '0 0 0 rgba(0, 0, 0, 0)' }} shape="circle" icon={<FormOutlined style={{ color: 'rgb(94,135,175)' }}  onClick={() => onChangeInfo(record)}/>} />
+            <Button style={{ borderWidth: 0, backgroundColor: 'rgba(0,0,0,0)', boxShadow: '0 0 0 rgba(0, 0, 0, 0)' }} shape="circle" icon={<FormOutlined style={{ color: 'rgb(94,135,175)' }} onClick={() => onChangeInfo(record)} />} />
           </Tooltip>
           {/* <Divider type="vertical" />
           <Tooltip title="删除">
@@ -247,9 +223,9 @@ const TableList: React.FC<unknown> = () => {
       valueType: 'text',
       hideInSearch: true,
       render: (_, record) => {
-        return departmentList.map((item:any) => {
+        return departmentList.map((item: any) => {
           if (item.itemKey == _) {
-            return  item.itemValue
+            return item.itemValue
           }
         })
       }
@@ -289,11 +265,11 @@ const TableList: React.FC<unknown> = () => {
       dataIndex: 'score',
       valueType: 'text',
       hideInSearch: true,
-      render: (_, record:any) => (
+      render: (_, record: any) => (
         <>
-          <Button type="primary" size="small" onClick={()=>{onCheckScore(record.studentUuid)}}> 实验成绩</Button>
+          <Button type="primary" size="small" onClick={() => { onCheckScore(record.studentUuid, "test") }}> 实验成绩</Button>
           <Divider type="vertical" />
-          <Button type="primary" size="small" onClick={()=>{onCheckScore(record.studentUuid)}}> 答题成绩</Button>
+          <Button type="primary" size="small" onClick={() => { onCheckScore(record.studentUuid, "answer") }}> 答题成绩</Button>
         </>
       ),
     },
@@ -346,9 +322,9 @@ const TableList: React.FC<unknown> = () => {
       valueType: 'text',
       hideInSearch: true,
       render: (_, record) => {
-        return departmentList.map((item:any) => {
+        return departmentList.map((item: any) => {
           if (item.itemKey == _) {
-            return  item.itemValue
+            return item.itemValue
           }
         })
       }
@@ -375,15 +351,36 @@ const TableList: React.FC<unknown> = () => {
       title: '审核',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record:any) => (
+      render: (_, record: any) => (
         <>
           <Button type="primary" size="small" onClick={() => onExamine(record.studentUuid, 'pass')}>通过</Button>
           <Divider type="vertical" />
-          <Button type="primary" danger size="small"  onClick={() => onExamine(record.studentUuid, 'failed')}>拒绝</Button>
+          <Button type="primary" danger size="small" onClick={() => onExamine(record.studentUuid, 'failed')}>拒绝</Button>
         </>
       ),
     },
   ];
+
+  const scoreColumns = [
+    {
+      title: '学号/工号',
+      dataIndex: 'studentUuid',
+    },
+    {
+      title: '使用时长',
+      dataIndex: 'useTimes',
+      render: (_: any) => _ || "-"
+    },
+    {
+      title: '分数',
+      dataIndex: 'score',
+    },
+    {
+      title: '更新时间',
+      dataIndex: 'createdTime',
+    }
+  ];
+
 
   return (
     <PageContainer
@@ -415,144 +412,47 @@ const TableList: React.FC<unknown> = () => {
             search={{
               labelWidth: 120,
             }}
-            // toolBarRender={() => [
-            //   <Button
-            //     key="1"
-            //     type="primary"
-            //     onClick={() => handleModalVisible(true)}
-            //   >
-            //     新建
-            //   </Button>,
-            // ]}
+            // pagination = {mainTableParams.pagination}
             request={async (params, sorter, filter) => {
-              console.log('---->', params, sorter, filter)
-              if (selectItem === '1'){
+              if (selectItem === '1') {
                 const param = {
                   "page": { "pageNum": params.current, "pageSize": params.pageSize },
                   "params": { "studentUuid": params?.studentUuid || "", "studentName": params?.studentName || "" }
                 }
-                const { data, success } = await request('/user/search', param, 'post');
+                const { data, code } = await request('/user/search', param, 'post');
                 return {
                   data: data?.list || [],
-                  // success,
+                  success: code == 200,
+                  total: data?.total || 0,
                 };
               } else {
                 const param = {
                   "page": { "pageNum": params.current, "pageSize": params.pageSize },
                   "params": { "studentUuid": params?.studentUuid || "", "studentName": params?.studentName || "" }
                 }
-                const { data, success } = await request('/user/searchExamine', param, 'post');
+                const { data, code } = await request('/user/searchExamine', param, 'post');
                 return {
                   data: data?.list || [],
-                  // success,
+                  success: code == 200,
+                  total: data?.total || 0
                 };
               }
-              
-              
-              //   res.then(response => {
-              //     if (response.code == 200) {
-
-              //     } else {
-
-              //     }
-              //  })
-
-              // const { data, success } = await queryUserList({
-              //   ...params,
-              //   // FIXME: remove @ts-ignore
-              //   // @ts-ignore
-              //   sorter,
-              //   filter,
-              // });
             }}
             columns={selectItem == "1" ? columns : columns2}
           // rowSelection={{
           //   onChange: (_, selectedRows) => setSelectedRows(selectedRows),
           // }}
           />
-          {selectedRowsState?.length > 0 && (
-            <FooterToolbar
-              extra={
-                <div>
-                  已选择{' '}
-                  <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-                  项&nbsp;&nbsp;
-                </div>
-              }
-            >
-              <Button
-                onClick={async () => {
-                  await handleRemove(selectedRowsState);
-                  setSelectedRows([]);
-                  actionRef.current?.reloadAndRest?.();
-                }}
-              >
-                批量删除
-              </Button>
-              {/* <Button type="primary">批量审批</Button> */}
-            </FooterToolbar>
-          )}
-          <CreateForm
-            onCancel={() => handleModalVisible(false)}
-            modalVisible={createModalVisible}
-          >
-            <ProTable<API.UserInfo, API.UserInfo>
-              onSubmit={async (value) => {
-                const success = await handleAdd(value);
-                if (success) {
-                  handleModalVisible(false);
-                  if (actionRef.current) {
-                    actionRef.current.reload();
-                  }
-                }
-              }}
-              rowKey="id"
-              type="form"
-              columns={selectItem == "1" ? columns : columns2}
-            />
-          </CreateForm>
-          {stepFormValues && Object.keys(stepFormValues).length ? (
-            <UpdateForm
-              onSubmit={async (value) => {
-                const success = await handleUpdate(value);
-                if (success) {
-                  handleUpdateModalVisible(false);
-                  setStepFormValues({});
-                  if (actionRef.current) {
-                    actionRef.current.reload();
-                  }
-                }
-              }}
-              onCancel={() => {
-                handleUpdateModalVisible(false);
-                setStepFormValues({});
-              }}
-              updateModalVisible={updateModalVisible}
-              values={stepFormValues}
-            />
-          ) : null}
 
-          <Drawer
-            width={600}
-            open={!!row}
-            onClose={() => {
-              setRow(undefined);
-            }}
-            closable={false}
-          >
-            {row?.name && (
-              <ProDescriptions<API.UserInfo>
-                column={2}
-                title={row?.name}
-                request={async () => ({
-                  data: row || {},
-                })}
-                params={{
-                  id: row?.name,
-                }}
-                columns={selectItem == "1" ? columns : columns2}
-              />
-            )}
+          <Drawer title={drawerTitle === 'test' ? '实验成绩' : '答题成绩'} size='large' placement="right" onClose={onClose} open={open}>
+            <Table
+              columns={scoreColumns}
+              rowKey={(record) => record.studentUuid}
+              dataSource={data}
+              pagination={tableParams.pagination}
+              loading={loading}
+              onChange={handleTableChange}
+            />
           </Drawer>
         </div>
       </div>

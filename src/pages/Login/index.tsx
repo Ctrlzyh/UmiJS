@@ -15,6 +15,8 @@ const AccessPage: React.FC = () => {
   const [userName, setUserName] = useState<String>("");
   const [password, setPassword] = useState<String>("");
   const [messageApi, ContextHolder] = message.useMessage();
+  const [loading, setLoading] = useState(false);
+
 
   const success = (msg:string) => {
     messageApi.open({
@@ -44,34 +46,36 @@ const AccessPage: React.FC = () => {
 
 
   const handleUserChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    console.log('Change:', e.target.value);
     setUserName(e.target.value)
   };
 
   const handlePsdChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    console.log('Change:', e.target.value);
     setPassword(e.target.value)
   };
 
   const onClickLogin = () => {
-    // history.push({ pathname: '/home' })
+    if (userName.length===0 || password.length ===0) {
+      error('请先填写用户名和密码')
+      return
+    }
+    setLoading(true)
     const params = {
       "studentUuid": userName,
        "password": password
     }
     let res = request('/user/login',{'params':params},'post');
      res.then(response => {
-      if(response.code == 200) {
-        success(response.msg)
-        userInfo.setUserInfo(response.data)
-        console.log('user--->', userInfo.getUserInfo())
+      setLoading(false)
+      if(response?.code == 200) {
+        success(response?.msg)
+        userInfo.setUserInfo(response?.data)
         if (userInfo.getUserInfo().studentUuid === 'admin') {
           history.push({ pathname: '/table' })
         } else {
           history.push({ pathname: '/home' })
         }
       } else {
-        error(response.msg)
+        error(response?.msg)
       }
     })
   }
@@ -81,7 +85,30 @@ const AccessPage: React.FC = () => {
   }
 
   const onClickVipLogin = () => {
-    history.push({ pathname: '/table' })
+    if (userName.length===0 || password.length ===0) {
+      error('请先填写用户名和密码')
+      return
+    }
+    setLoading(true)
+    const params = {
+      "studentUuid": userName,
+       "password": password
+    }
+    let res = request('/user/login',{'params':params},'post');
+     res.then(response => {
+      setLoading(false)
+      if(response?.code == 200) {
+        success(response?.msg)
+        userInfo.setUserInfo(response?.data)
+        if (userInfo.getUserInfo().studentUuid === 'admin') {
+          history.push({ pathname: '/table' })
+        } else {
+          history.push({ pathname: '/home' })
+        }
+      } else {
+        error(response?.msg)
+      }
+    })
   }
 
   return (
@@ -104,7 +131,7 @@ const AccessPage: React.FC = () => {
               <div style={{ fontSize: 18, color: "#333", marginTop: 18 }}>欢迎使用虛拟仿真实验平台</div>
               <Input style={{ width: 260, marginTop: 25, borderColor: "#333" }} size='large' placeholder="用户名" prefix={<UserOutlined />} onChange={handleUserChange} />
               <Input.Password style={{ width: 260, marginTop: 16, borderColor: "#333" }} size='large' placeholder="密码" prefix={<LockOutlined />} onChange={handlePsdChange} />
-              <Button style={{ width: 260, marginTop: 25, height: 36, borderRadius: 18, fontSize: 18, fontWeight: 800, paddingTop: 2, backgroundColor: "rgb(39,92,201)" }} type="primary" onClick={onClickLogin}>登录</Button>
+              <Button loading={loading} style={{ width: 260, marginTop: 25, height: 36, borderRadius: 18, fontSize: 18, fontWeight: 800, paddingTop: 2, backgroundColor: "rgb(39,92,201)" }} type="primary" onClick={onClickLogin}>登录</Button>
               <Button style={{ width: 260, marginTop: 12, height: 36, borderRadius: 18, fontSize: 18, fontWeight: 800, paddingTop: 2, backgroundColor: "rgb(39,92,201)" }} type="primary" onClick={onClickRegister}>注册</Button>
               <Button style={{ width: 260, marginTop: 12, height: 36, borderRadius: 18, fontSize: 18, fontWeight: 800, paddingTop: 2, backgroundColor: "rgb(97,148,230)" }} type="primary" onClick={onClickVipLogin}>专家登录入口</Button>
             </div>

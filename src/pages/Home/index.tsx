@@ -1,6 +1,4 @@
 import React, { useRef, useState, useEffect} from 'react';
-import Guide from '@/components/Guide';
-import { trim } from '@/utils/format';
 import { PageContainer } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
 import styles from './index.less';
@@ -14,16 +12,8 @@ import { history } from 'umi';
 
 
 const HomePage: React.FC = () => {
-  const { name } = useModel('global');
   const [videoNumber, setVideoNumber] = useState<String>("1");
   const [modal, ContextHolder] = Modal.useModal();
-
-  // useEffect(() => {
-  //  let res = request('/user/info',null,'post');
-  //  res.then(response => {
-  //   // console.log('111111111网络请求成功：', response);
-  // })
-  // }, []);
 
   const onLogout = () => {
     modal.confirm({
@@ -44,12 +34,12 @@ const HomePage: React.FC = () => {
   };
 
   const onChange = (key: string) => {
-    console.log(key);
+
   };
 
   const toOther = () =>{
-      console.log('11111')
-      // studentUuid
+
+    // studentUuid
       // userInfo.getUserInfo()?.studentName
       window.open(`http://moni3.haimijiaoyu.com?id=${userInfo.getUserInfo()?.studentUuid}`)
   }

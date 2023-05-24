@@ -1,20 +1,12 @@
 import { PageContainer } from '@ant-design/pro-components';
-import { Access, useAccess } from '@umijs/max';
 import { LeftOutlined } from '@ant-design/icons';
-import styles from './index.less';
 import { useEffect, useState } from 'react';
 import { history,useNavigate } from 'umi';
-import type { CascaderProps } from 'antd';
 import {
   message,
   Button,
-  Cascader,
-  Checkbox,
-  Col,
   Form,
   Input,
-  InputNumber,
-  Row,
   Select,
 } from 'antd';
 import request from '@/utils/request';
@@ -22,21 +14,14 @@ import request from '@/utils/request';
 
 const { Option } = Select;
 
-interface DataNodeType {
-  value: string;
-  label: string;
-  children?: DataNodeType[];
-}
-
 
 const ReigsterPage: React.FC = () => {
 
-  const [windowSize, setWindowSize] = useState(getWindowSize());
   const [departmentList, setDepartmentList] = useState<Array<any>>([]);
-
   const [messageApi, ContextHolder] = message.useMessage();
+  const [loading, setLoading] = useState(false);
 
-  console.log('---location->',history.location)
+
   
   if (history.location?.state?.type === 'change') {
     document.title = "编辑信息"
@@ -61,11 +46,11 @@ const ReigsterPage: React.FC = () => {
     const params =  { "baseCode": "department", "itemKey": "", "parentItemKey": "" }
     let res = request('/baseData/searchByCode',params,'post');
     res.then(response => {
-      if (response.code == 200) {
-        setDepartmentList(response.data)
+      if (response?.code == 200) {
+        setDepartmentList(response?.data)
       } else {
         setDepartmentList([])
-        error(response.msg)
+        error(response?.msg)
       }
    })
    }, []);
@@ -96,13 +81,13 @@ const ReigsterPage: React.FC = () => {
 
   const [form] = Form.useForm();
   const toBack = ()=>{
-    // console.log('---history-->',history)
     history.back()
     // useNavigate.
     
   }
   const onFinish = (values: any) => {
     console.log('Received values of form: ', values);
+    setLoading(true)
     // 
     // history.push({ pathname: '/login' })
     const { studentUuid, studentName, gender, password, phoneNumber, email,department,specialities,className } = values
@@ -122,20 +107,21 @@ const ReigsterPage: React.FC = () => {
     if (history.location?.state?.type === 'change') {
       let res = request('/user/update',{'params':params},'post');
      res.then(response => {
-      if(response.code == 200) {
-        success(response.msg)
+      setLoading(false)
+      if(response?.code == 200) {
+        success(response?.msg)
         
       } else {
-        error(response.msg)
+        error(response?.msg)
       }
     })
     } else {
       let res = request('/user/register',{'params':params},'post');
       res.then(response => {
-       if(response.code == 200) {
-         success(response.msg)
+       if(response?.code == 200) {
+         success(response?.msg)
        } else {
-         error(response.msg)
+         error(response?.msg)
        }
      })
     }
@@ -331,7 +317,7 @@ const ReigsterPage: React.FC = () => {
               </Form.Item>
 
               <Form.Item {...tailFormItemLayout}>
-                <Button style={{ width: 300, height: 40 }} type="primary" htmlType="submit">
+                <Button loading={loading} style={{ width: 300, height: 40 }} type="primary" htmlType="submit">
                   提交
                 </Button>
               </Form.Item>
