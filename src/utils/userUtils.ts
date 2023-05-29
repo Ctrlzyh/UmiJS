@@ -22,7 +22,7 @@ const setUserInfo = (info: any)=>{
 
 const getUserInfo = () =>{
     const info = localStorage.getItem("userInfo")
-    return  JSON.parse(info || "")
+    return  JSON.parse(info || "{}")
 }
 
 export default {setUserInfo, getUserInfo}

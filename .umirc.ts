@@ -62,7 +62,7 @@ export default defineConfig({
     '/api': {
       'target': 'http://fangzhen.haimijiaoyu.com/',
       'changeOrigin': true,
-      'pathRewrite': { '^/api' : 'pam-api' },
+      'pathRewrite': { '^/api' : 'api' },
     },
   },
 });
