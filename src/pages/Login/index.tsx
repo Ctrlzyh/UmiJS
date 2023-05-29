@@ -119,19 +119,17 @@ const AccessPage: React.FC = () => {
         <div className={styles.topbg} style={{ height: windowSize.innerHeight * 0.7 }} />
         <div style={{ height: windowSize.innerHeight * 0.3, width: "100%", backgroundColor: "rgb(129,153,179)" }} />
         <div className={styles.container} style={{ height: windowSize.innerHeight, width: windowSize.innerWidth, }} >
-          <img style={{ width: '21%', marginTop: "2%" }} src={require('../../assets/login_logo.png')} />
+          <img style={{ width: '21%', marginTop: "3%" }} src={require('../../assets/login_logo.png')} />
           <div className={styles.content} style={{ height: "65%", width: "80%", backgroundColor: 'white', marginTop: '2%', borderRadius: windowSize.innerWidth * 0.02, }}>
             <img style={{ height: "100%", width: "58%" }} src={require('../../assets/login_left.png')} />
             <div style={{ height: "100%", width: "42%", display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <img style={{ width: '19%',marginTop: '5%' }} src={require('../../assets/login_top_logo.png')} />
-            <div style={{ fontSize: windowSize.innerWidth * 0.0153, color: "#333", marginTop:'4%'}}>欢迎使用虛拟仿真实验平台</div>
-            <Input style={{ width: '66%',height:'8.5%', marginTop: '5%', borderColor: "#333", fontSize: windowSize.innerWidth * 0.014,}} size='large' placeholder="用户名" prefix={<UserOutlined />} onChange={handleUserChange} />
-            <Input.Password style={{ width: '66%',height:'8.5%', marginTop: '4%', borderColor: "#333",fontSize: windowSize.innerWidth * 0.014, }} size='large' placeholder="密码" prefix={<LockOutlined />} onChange={handlePsdChange} />
-            <Button loading={loading} style={{  width: '66%', marginTop: '6%', height: '8%', borderRadius: windowSize.innerWidth * 0.0153, fontSize: windowSize.innerWidth * 0.015, fontWeight: 800, paddingTop: windowSize.innerWidth * 0.0023, backgroundColor: "rgb(39,92,201)"  }} type="primary" onClick={onClickLogin}>登录</Button>
-            <Button style={{ width: '66%', marginTop: '3%', height: '8%', borderRadius: windowSize.innerWidth * 0.0153, fontSize: windowSize.innerWidth * 0.015, fontWeight: 800, paddingTop: windowSize.innerWidth * 0.0023, backgroundColor: "rgb(39,92,201)" }} type="primary" onClick={onClickRegister}>注册</Button>
-            <Button style={{ width: '66%', marginTop: '3%', height: '8%', borderRadius: windowSize.innerWidth * 0.0153, fontSize: windowSize.innerWidth * 0.015, fontWeight: 800, paddingTop: windowSize.innerWidth * 0.0023, backgroundColor: "rgb(97,148,230)" }} type="primary" onClick={onClickVipLogin}>专家登录入口</Button>
-
-
+              <img style={{ width: '16%', marginTop: '5%' }} src={require('../../assets/login_top_logo.png')} />
+              <div style={{ fontSize: windowSize.innerWidth * 0.0153, color: "#333", marginTop: '4%' }}>欢迎使用虛拟仿真实验平台</div>
+              <Input style={{ width: '66%', height: '8.5%', marginTop: '5%', borderColor: "#333", fontSize: windowSize.innerWidth * 0.014, }} size='large' placeholder="用户名" prefix={<UserOutlined />} onChange={handleUserChange} />
+              <Input.Password style={{ width: '66%', height: '8.5%', marginTop: '4%', borderColor: "#333", fontSize: windowSize.innerWidth * 0.014, }} size='large' placeholder="密码" prefix={<LockOutlined />} onChange={handlePsdChange} />
+              <Button loading={loading} style={{ width: '66%', marginTop: '6%', height: '8%', borderRadius: windowSize.innerWidth * 0.0153, fontSize: windowSize.innerWidth * 0.015, fontWeight: 800, paddingTop: windowSize.innerWidth * 0.0023, backgroundColor: "rgb(39,92,201)" }} type="primary" onClick={onClickLogin}>登录</Button>
+              <Button style={{ width: '66%', marginTop: '3%', height: '8%', borderRadius: windowSize.innerWidth * 0.0153, fontSize: windowSize.innerWidth * 0.015, fontWeight: 800, paddingTop: windowSize.innerWidth * 0.0023, backgroundColor: "rgb(39,92,201)" }} type="primary" onClick={onClickRegister}>注册</Button>
+              <Button style={{ width: '66%', marginTop: '3%', height: '8%', borderRadius: windowSize.innerWidth * 0.0153, fontSize: windowSize.innerWidth * 0.015, fontWeight: 800, paddingTop: windowSize.innerWidth * 0.0023, backgroundColor: "rgb(97,148,230)" }} type="primary" onClick={onClickVipLogin}>专家登录入口</Button>
             </div>
           </div>
         </div>
