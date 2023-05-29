@@ -14,6 +14,10 @@ import { history } from 'umi';
 const HomePage: React.FC = () => {
   const [videoNumber, setVideoNumber] = useState<String>("1");
   const [modal, ContextHolder] = Modal.useModal();
+  const imgRef = useRef(null);
+  const [divHeight, setDivHeight] = useState(0);
+
+
 
   const onLogout = () => {
     modal.confirm({
@@ -29,6 +33,28 @@ const HomePage: React.FC = () => {
     });
   }
 
+  useEffect(() => {
+    doSomething()
+
+    window.addEventListener('resize', doSomething);
+ 
+    return () => {
+        // 组件销毁时移除监听事件
+        window.removeEventListener('resize', doSomething);
+    }
+
+  }, []);
+
+
+  function doSomething() {
+    setDivHeight(imgRef?.current?.clientHeight);
+  };
+
+  
+
+  // const height = imgRef?.current;
+  //   console.log('height', height);
+
   const handleSizeChange = (e: RadioChangeEvent) => {
     setVideoNumber(e.target.value)
   };
@@ -41,14 +67,29 @@ const HomePage: React.FC = () => {
 
     // studentUuid
       // userInfo.getUserInfo()?.studentName
-      window.open(`http://moni3.haimijiaoyu.com?id=${userInfo.getUserInfo()?.studentUuid}`)
+      if (userInfo.getUserInfo()) {
+        window.open(`http://moni3.haimijiaoyu.com?id=${userInfo.getUserInfo()?.studentUuid}`)
+      } else {
+        window.open(`http://moni3.haimijiaoyu.com`)
+      }
   }
 
   const items: TabsProps['items'] = [
     {
       key: '1',
       label: `仿真资源`,
-      children: <img style={{ width: "100%"}} src={require('../../assets/pane1.png')} onClick={toOther}/>,
+      children:
+       <div style={{ width: "100%", position:'relative'}} >
+        <img ref={imgRef} style={{ width: "100%"}} src={require('../../assets/pane1.png')} />
+        <div style={{
+          backgroundColor:'rgba(0,0,0,0)',
+           width: '13%', 
+           height: divHeight * 0.2,
+            position:'absolute',
+            bottom: '10%',
+            right: '3.5%'}}
+            onClick={toOther}></div>
+       </div>
     },
     {
       key: '2',
@@ -70,14 +111,30 @@ const HomePage: React.FC = () => {
       label: `项目特色`,
       children: 
       <div>
-        <div style={{fontSize: "16px", marginBottom: "8px"}}>1.课程管理添加后无法对其进行编辑，添加编辑或删除功能</div>
+        {/* <div style={{fontSize: "16px", marginBottom: "8px"}}>1.课程管理添加后无法对其进行编辑，添加编辑或删除功能</div>
         <img style={{ width: "100%"}}  src={require('../../assets/pane501.png')} />,
         <div style={{fontSize: "16px", marginBottom: "8px"}}>2.资料上传添加一行观看链接。</div>
         <img style={{ width: "100%"}}  src={require('../../assets/pane502.png')} />,
         <div style={{fontSize: "16px", marginBottom: "8px"}}>3.素材管理只有删除没有编辑，添加编辑功能。</div>
         <img style={{ width: "100%"}}  src={require('../../assets/pane503.png')} />,
         <div style={{fontSize: "16px", marginBottom: "8px"}}>4.资源库图片没有正常显示。</div>
-        <img style={{ width: "100%"}}  src={require('../../assets/pane504.png')} />,
+        <img style={{ width: "100%"}}  src={require('../../assets/pane504.png')} />, */}
+        <div style={{fontSize: "17px",fontWeight:'500', textAlign:'center',marginBottom:'15px' }}>实验教学项目特色</div>
+        <div style={{fontWeight:'500'}}>实验方案设计思路：</div>
+        <div>（1）人才培养符合我国生态农业的发展需求我国高度重视农作物病虫害防治工作，鼓励和支持使用安全、高效、经济的农药。利用植物中的有效活性成分进行植物病害的防治，是当前农药研究的重点和热点之一。本项目顺应生态农业的发展趋势，将病害防治与人才培养、创新能力相呼应，虚实结合，实现高校人才培养体系与生态农业发展需求的紧密结合。</div>
+        <div>（2）融合科研和教学，实现学与研无缝对接 本项目由河南农业大学烟草学院自主研发、自主设计，依托于本学院烟草学科优势，紧密联系生产实际，是科学研究与实际应用之间的有效衔接，也是本院科研团队研究成果的转化。通过虚拟仿真实验，让学生在实验教学中由被动变为主动，不受时间、空间限制，多次学习，充分锻炼学生严谨、科学的逻辑思维和创新能力，也更好的实现本科教学和科研对接。 </div>
+        <br/>
+        <div style={{fontWeight:'500'}}>教学方法创新： </div>
+        <div>牛津杯法抑菌实验无菌环境要求高，高压蒸汽灭菌存在一定的安全隐患，以及植物病原菌易造成传播风险污染环境，在实际教学当中很难完整开展课堂教学和保证每个学生的亲自动手操作。本项目本着“能实不虚、虚实结合、虚实互补”的原则，开发虚拟仿真系统有效解决上述难题。</div>
+        <div>本项目的教学方法具有以下特点：</div>
+        <div>（1）情景再现式的交互教学。充分挖掘虚拟仿真软件的技术优势，使实际场景或仪器设备构造形象呈现在学生面前，学生可以身临其境进行反复操作演练，使学习更加深入而且生动。教师虚拟现场教学与学生交流互动，实现自主学习、互助学习、研究性学习有机结合。</div>
+        <div>（2）开放式教学。实验系统对所有选课学生开放，校外用户可通过注册账户访问平台，使学生在虚拟条件下短时间掌握无菌操作、菌液涂布等实验技能。</div>
+        <br/>
+        <div style={{fontWeight:'500'}}>评价体系创新： </div>
+        <div>采用“预习测验+实验操作+实验报告+实验考核 =实验成绩”的模式评估学生的实验表现。 利用预习测验评价学生对实验原理及操作注意事项的掌握情况； 利用实验操作，评价学生对各个实验各个环节的掌握情况； 利用实验报告，考核学生对实验结果的分析能力； 利用考核模块，评价学生对各项实验技术的熟练程度。 </div>
+        <br/>
+        <div style={{fontWeight:'500'}}>对传统教学的延伸与拓展：</div>
+        <div>该项目突破了传统实验教学过程对仪器设备、实验教学时间与空间的束缚，丰富了传统实验教学内容，实现了教学与科研的有机融合，有利于实验教学资源面向社会的开放共享，也促进了实验教学的深入改革。</div>
       </div>,
     },
     {
@@ -119,7 +176,7 @@ const HomePage: React.FC = () => {
             </div>
             <div style={{cursor: 'pointer'}} onClick={onLogout}>
               <img className={styles.headerNameLogo} src={require('../../assets/user.png')} />
-              <span className={styles.headerName}>{ userInfo.getUserInfo()?.studentName || '用户昵称'}</span>
+              <span className={styles.headerName}>{ userInfo.getUserInfo()?.studentName || '专家'}</span>
             </div>
           </div>
         </div>
@@ -149,9 +206,9 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div style={{ width: "64%", height: "1px", backgroundColor: "#000", margin: "0 auto", marginTop: "20px" }}></div>
+          <div style={{ width: "64%", height: "1px", backgroundColor: "#000", margin: "0 auto", marginTop: "20px", minWidth: 977 }}></div>
 
-        <div className={styles.infoView}>
+        <div className={styles.infoView} style={{minWidth: 977}}>
           <Tabs defaultActiveKey="1" size="large" items={items} onChange={onChange} />
         </div>
 
