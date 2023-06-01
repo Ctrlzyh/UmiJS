@@ -34,7 +34,9 @@ const HomePage: React.FC = () => {
   }
 
   useEffect(() => {
-    doSomething()
+    setTimeout(() => {
+      doSomething()
+    }, 200);
 
     window.addEventListener('resize', doSomething);
  
@@ -50,10 +52,6 @@ const HomePage: React.FC = () => {
     setDivHeight(imgRef?.current?.clientHeight);
   };
 
-  
-
-  // const height = imgRef?.current;
-  //   console.log('height', height);
 
   const handleSizeChange = (e: RadioChangeEvent) => {
     setVideoNumber(e.target.value)
@@ -64,9 +62,6 @@ const HomePage: React.FC = () => {
   };
 
   const toOther = () =>{
-
-    // studentUuid
-      // userInfo.getUserInfo()?.studentName
       if (userInfo.getUserInfo()) {
         window.open(`http://moni3.haimijiaoyu.com?id=${userInfo.getUserInfo()?.studentUuid}`)
       } else {
