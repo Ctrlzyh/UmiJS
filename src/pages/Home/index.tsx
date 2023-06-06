@@ -16,6 +16,7 @@ const HomePage: React.FC = () => {
   const [modal, ContextHolder] = Modal.useModal();
   const imgRef = useRef(null);
   const [divHeight, setDivHeight] = useState(0);
+  const [total, setTotal] = useState(0);
 
 
 
@@ -37,8 +38,10 @@ const HomePage: React.FC = () => {
     setTimeout(() => {
       doSomething()
     }, 200);
-
+   
     window.addEventListener('resize', doSomething);
+
+    getDataInfo()
 
     return () => {
       // 组件销毁时移除监听事件
@@ -46,6 +49,15 @@ const HomePage: React.FC = () => {
     }
 
   }, []);
+
+  const getDataInfo = async ()=> {
+    const param = {
+      "page": { "pageNum": 1, "pageSize": 1 },
+      "params": { "studentUuid": "", "studentName":  "" }
+    }
+    const { data } = await request('/user/search', param, 'post');
+    setTotal(data?.total || 0)
+  }
 
 
   function doSomething() {
@@ -103,10 +115,10 @@ const HomePage: React.FC = () => {
                   verticalAlign: 'middle'
                 }}>5.0</span>
                 <img src={require('../../assets/per.png')} />
-                <span style={{ marginLeft: 6, color: "#888", fontSize: 16, verticalAlign: 'middle' }}>1998人学过</span>
+                <span style={{ marginLeft: 6, color: "#888", fontSize: 16, verticalAlign: 'middle' }}>{total}人学过</span>
               </div>
               <p style={{ fontSize: 18, fontWeight: "600", marginTop: 18, marginBottom: 16 }}>牛津杯法检测植物粗提物对烟草病原真菌的抑制作用虚拟仿真实验</p>
-              <span style={{ color: '#333', fontSize: 16, lineHeight: '24px', textIndent: 4 }}>本实物基于间南农业大学恒草学院学科优势，以烟草品质生态团队研究成果为基础、模拟学习PDA培养基配制、高压蒸汽灭菌、倒平板、菌液涂布、摆放牛津杯、添加外源物质等实验内容。</span>
+              <span style={{ color: '#333', fontSize: 16, lineHeight: '24px', }}><span style={{color:'transparent'}}>本实</span>本实验基于河南农业大学烟草学院学科优势，以烟草品质生态团队研究成果为基础、模拟学习PDA培养基配制、高压蒸汽灭菌、倒平板、菌液涂布、摆放牛津杯、 添加外源物质等实验内容。</span>
             </div>
             <div className={styles.start} onClick={toOther}></div>
           </div>
@@ -208,7 +220,7 @@ const HomePage: React.FC = () => {
           <div className={styles.introductionView}>
             <div className={styles.introductionLeftView}>
               <div className={styles.rowText1}>牛津杯法检测植物粗提物对烟草病原真菌的抑制作用虛拟仿真实验</div>
-              <span className={styles.rowText2} style={{ opacity: 0 }}>本实验基</span>
+              <span className={styles.rowText2} style={{ opacity: 0 }}>本实</span>
               <span className={styles.rowText2}>本实验基于河南农业大学烟草学院学科优势，以烟草品质生态团队研究成果为基础、模拟学习PDA培养基配制、高压蒸汽灭菌、倒平板、菌液涂布、摆放牛津杯、 添加外源物质等实验内容。</span>
             </div>
             <div className={styles.introductionRightView}>
